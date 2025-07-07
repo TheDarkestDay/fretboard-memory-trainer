@@ -4,13 +4,16 @@ import { NotesSequence } from "../NotesSequence";
 import { InputAudioDevice } from "../InputAudioDevice";
 import { Note } from "../Note";
 import { Fretboard } from "../Fretboard";
+import { getStringDisplayName, type GuitarString } from "../GuitarString";
 
 const expectedNoteName = ref<string>("");
+const chosenString = ref<GuitarString>("HIGH_E");
+const availableStrings = ref<GuitarString[]>(["HIGH_E", "B", "G", "D", "A", "LOW_E"]);
 const score = ref(0);
 const gameState = ref("setup");
 const remainingTimeInSeconds = ref(0);
 const hint = ref("");
-const roundDuration = 30;
+const roundDuration = 60;
 const guessTimeoutMs = 5_000;
 
 const fretboard = new Fretboard();
@@ -28,14 +31,14 @@ const handleTimerTick = () => {
 };
 
 const handleCorrectGuessTimeout = () => {
-  const noteLocation = fretboard.getNoteLocationOnString("HIGH_E", expectedNote);
+  const noteLocation = fretboard.getNoteLocationOnString(chosenString.value, expectedNote);
   hint.value = `Play fret no. ${noteLocation.fretNumber} on ${noteLocation.stringName} string`;
 };
 
 const startGame = async () => {
   const inputDevice = new InputAudioDevice();
   await inputDevice.startListening();
-  const notesSequence = new NotesSequence(fretboard.getAllNotesOnString("HIGH_E"));
+  const notesSequence = new NotesSequence(fretboard.getAllNotesOnString(chosenString.value));
 
   score.value = 0;
   hint.value = "";
@@ -70,6 +73,21 @@ const handleRestartButtonClick = () => {
 <template>
     <main class="layout centered-content">
       <div class="grid">
+        <section class="card options">
+          <p v-if="gameState === 'setup' || gameState === 'end'">
+            <label for="notesRange">
+              Select string to practice: 
+            </label>
+            <select id="notesRange" v-model="chosenString">
+              <option v-for="guitarString of availableStrings" :value="guitarString">
+                {{ getStringDisplayName(guitarString) }}
+              </option>
+            </select>
+          </p>
+          <p v-else>
+            Practicing {{ getStringDisplayName(chosenString) }} string
+          </p>
+        </section>
         <section class="card hero">
           <div class="full-height centered-content" v-if="gameState === 'setup'">
             <button class="button" @click="handleStartButtonClick">
@@ -140,9 +158,14 @@ const handleRestartButtonClick = () => {
     display: grid;
     gap: .5rem;
     grid-template-areas: 
+      "options options"
       "hero hero"
       "timer score";
     grid-template-columns: 1fr 1fr;
+  }
+
+  .options {
+    grid-area: options;
   }
 
   .hero {

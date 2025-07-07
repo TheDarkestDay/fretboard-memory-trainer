@@ -59,4 +59,43 @@ export class Note {
     static D_SHARP_5 = new Note("D#5", 622);
     static E_FLAT_5 = new Note("Eb5", 622);
     static E5 = new Note("E5", 659);
+
+    static B3 = new Note("B3", 247);
+    static C4 = new Note("C4", 262);
+    static C_SHARP_4 = new Note("C#4", 277);
+    static D_FLAT_4 = new Note("Db4", 277);
+    static D4 = new Note("D4", 294);
+    static D_SHARP_4 = new Note("D#4", 311);
+    static E_FLAT_4 = new Note("Eb4", 311);
+
+    static G3 = new Note("G3", 196);
+    static G_SHARP_3 = new Note("G#3", 208);
+    static A_FLAT_3 = new Note("Ab3", 208);
+    static A3 = new Note("A3", 220);
+    static A_SHARP_3 = new Note("A#3", 233);
+    static B_FLAT_3 = new Note("Bb3", 233);
+
+    static D3 = new Note("D3", 147);
+    static D_SHARP_3 = new Note("D#3", 156);
+    static E_FLAT_3 = new Note("Eb3", 156);
+    static E3 = new Note("E3", 165);
+    static F3 = new Note("F3", 175);
+    static F_SHARP_3 = new Note("F#3", 185);
+    static G_FLAT_3 = new Note("Gb3", 185);
+
+    static A2 = new Note("A2", 110);
+    static A_SHARP_2 = new Note("A#2", 117);
+    static B_FLAT_2 = new Note("Bb2", 117);
+    static B2 = new Note("B2", 123);
+    static C2 = new Note("C2", 131);
+    static C_SHARP_2 = new Note("C#2", 139);
+    static D_FLAT_2 = new Note("Db2", 139);
+
+    static E2 = new Note("E2", 82);
+    static F2 = new Note("F2", 87);
+    static F_SHARP_2 = new Note("F#2", 92);
+    static G_FLAT_2 = new Note("Gb2", 92);
+    static G2 = new Note("G2", 98);
+    static G_SHARP_2 = new Note("G#2", 104);
+    static A_FLAT_2 = new Note("Ab2", 104);
 }
