@@ -28,6 +28,10 @@ export class Note {
         return Math.floor(this.getMidiNoteNumber() / 12) - 1;
     }
 
+    isSharp() {
+        return this.name.includes("#");
+    }
+
     static fromFrequency(frequency: number) {
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         const midiNoteNumber = Math.round(12 * Math.log2(frequency / Note.A4.getFrequency())) + 69;

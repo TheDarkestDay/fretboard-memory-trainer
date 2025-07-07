@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { NotesSequence } from "../NotesSequence";
-import { FIRST_STRING } from "../note-ranges";
 import { InputAudioDevice } from "../InputAudioDevice";
-import type { Note } from "../Note";
-import { sleep } from "../utils";
+import { Note } from "../Note";
+import { Fretboard } from "../Fretboard";
 
-const expectedNote = ref<Note | null>(null);
+const expectedNoteName = ref<string>("");
 const score = ref(0);
 const gameState = ref("setup");
 const remainingTimeInSeconds = ref(0);
+const hint = ref("");
 const roundDuration = 30;
+const guessTimeoutMs = 5_000;
+
+const fretboard = new Fretboard();
 
 let intervalHandle: number;
+let expectedNote: Note | null = null;
 
 const handleTimerTick = () => {
   remainingTimeInSeconds.value = remainingTimeInSeconds.value - 1;
@@ -23,28 +27,34 @@ const handleTimerTick = () => {
   }
 };
 
+const handleCorrectGuessTimeout = () => {
+  const noteLocation = fretboard.getNoteLocationOnString("HIGH_E", expectedNote);
+  hint.value = `Play fret no. ${noteLocation.fretNumber} on ${noteLocation.stringName} string`;
+};
+
 const startGame = async () => {
   const inputDevice = new InputAudioDevice();
   await inputDevice.startListening();
-  const notesSequence = new NotesSequence(FIRST_STRING);
+  const notesSequence = new NotesSequence(fretboard.getAllNotesOnString("HIGH_E"));
 
   score.value = 0;
+  hint.value = "";
   gameState.value = "inProgress";
   remainingTimeInSeconds.value = roundDuration;
   intervalHandle = setInterval(handleTimerTick, 1_000);
 
   while (gameState.value === "inProgress") {
+    hint.value = "";
     const nextNote = notesSequence.getNext();
-    expectedNote.value = nextNote;
+    expectedNote = nextNote;
+    expectedNoteName.value = expectedNote.getName();
 
-    const isGuessCorrect = await Promise.race([
-      sleep(3_000).then(() => false),
-      inputDevice.waitUntilNoteIsPlayed(nextNote).then(() => true)
-    ]);
+    const guessTimeoutHandle = setTimeout(handleCorrectGuessTimeout, guessTimeoutMs);
 
-    if (isGuessCorrect) {
-      score.value = score.value + 1;
-    }
+    await inputDevice.waitUntilNoteIsPlayed(nextNote);
+
+    clearTimeout(guessTimeoutHandle);
+    score.value = score.value + 1;
   }
 }
 
@@ -73,7 +83,11 @@ const handleRestartButtonClick = () => {
             </h2>
 
             <p class="targetNote">
-              {{ expectedNote?.getName() }}
+              {{ expectedNoteName }}
+            </p>
+
+            <p v-if="hint" class="subtitle">
+              {{ hint }}
             </p>
           </div>
 
@@ -145,6 +159,10 @@ const handleRestartButtonClick = () => {
 
   .title {
     font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 28px;
   }
 
   .targetNote {

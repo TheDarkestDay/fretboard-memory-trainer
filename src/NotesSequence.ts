@@ -1,9 +1,9 @@
-import type { NotesRange } from "./note-ranges";
+import { Note } from "./Note";
 
 export class NotesSequence {
-    private readonly range: NotesRange
+    private readonly range: Note[]
 
-    constructor(range: NotesRange) {
+    constructor(range: Note[]) {
         this.range = range;
     }
 
